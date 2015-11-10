@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1.0" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" href="css/pullToRefresh.css"/>
+	<script src="js/iscroll.js"></script>
+	<script src="js/pullToRefresh.js"></script>
+</head>
+<body>
+	<section class="content">
+		<div class="wrap">
+			<div class="news_mg" id="wrapper">
+				<ul>
+
+				</ul>
+			</div>
+		</div>
+	</section>
+	<script type="text/javascript" src="js/zepto.js"></script>
+	<script type="text/javascript">
+		refresher.init({
+			id:"wrapper",
+			pullDownAction:Refresh,
+			pullUpAction:Load
+		});
+		var generatedCount = 0;
+		function Refresh() {
+			setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
+				var el, li, i;
+				el =document.querySelector("#wrapper ul");
+				el.innerHTML='';
+				for (i=0; i<11; i++) {
+					li = document.createElement('li');
+					li.appendChild(document.createTextNode('async row ' + (++generatedCount)));
+				el.insertBefore(li, el.childNodes[0]);
+				}	
+				myScroll.refresh();/****remember to refresh when you action was completed！！！****/
+			}, 2000);
+		}
+
+		function Load(dt) {
+			setTimeout(function () {// <-- Simulate network congestion, remove setTimeout from production!
+				getServerData('load','11');
+
+			}, 1000);
+		}
+		function getServerData(type,url){
+			var dt;
+			$.ajax({
+				type: 'GET',
+				url: 'data.json',
+			  	dataType: 'json',
+			  	success: function(data){
+			    	dt = eval(data.data);
+			    	var el, li, i;
+				el =document.querySelector("#wrapper ul");
+				for (i=0; i<dt.length; i++) {
+					var str = "";
+					li = document.createElement('li');
+					li.innerHTML = str;
+					el.appendChild(li, el.childNodes[0]);
+				}
+				myScroll.refresh();			    	
+			  	},
+			  	error: function(xhr, type){
+			  		dt = "";
+			  		getData(dt);
+			    	alert('Ajax error!')
+			  	}
+			})
+		}
+		
+</script>
+</body>
+</html>
